@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	    <meta charset="utf-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1">
+	    <link rel="stylesheet" type="text/css" href="css/style.css">
+	    <title>新增店铺</title>
+	</head>
+
+	<body>
+		<div class="container">
+			<div class="form ui-radius-6 ui-border" id="storeInfo">
+				<div class="form-row">
+					<label>*店铺名称</label>
+					<input type="text" id="name">
+				</div>
+				<div class="form-row">
+					<label>*店铺电话</label>
+					<input type="number" id="phone">
+				</div>
+
+				<!-- <div class="form-row">
+					<label>店铺地址*</label>
+					<input type="text" value="13612205123" readonly>
+				</div> -->
+                <div class="form-row">
+                    <label>店铺类别</label>
+                    <select id="IndustryOne" onchange="updateIndustryTwoInfo()"></select>
+                    <select id="industryId"></select>
+                </div>
+				<div class="form-row">
+					<label>所在城市</label>
+					<select id="provinceId" onchange="updateCityInfo()"></select>
+					<select id="cityId" onchange="loadDistrictInfo()"></select>
+				</div>
+				<div class="form-row">
+					<label>所在商圈</label>
+					<select id="districtParentId" onchange="updateDistrict2()"></select>
+					<select id="districtId"></select>
+				</div>
+                <div class="form-row">
+                    <label>*详细地址</label>
+                    <input type="text" id="address">
+
+                        <input id="getLocationBtn" type="button" onclick="getLocation()" value="定位" style="padding: 5px;margin: 5px;"/>
+                        <input id="otherPoint" type="button" onclick="window.jsObj.chooseOtherPoint()" value="其他位置" style="padding: 5px;margin: 5px;display: none"/>
+
+                    <input type="text" id="latitude" hidden="">
+                    <input type="text" id="longitude" hidden="">
+                </div>
+				<div class="form-row">
+					<label>店铺简介</label>
+					<input type="text" id="describe">
+				</div>
+				<div class="form-row">
+					<label>关键词</label>
+					<input type="text" class="ui-icon-right ui-icon-edit" id="keyword" onclick="window.jsObj.keyWordEdit(this.value)" readonly>
+				</div>
+				<div class="form-row">
+					<label>*营业时间</label>
+                    <input type="text" id="vipOrderTime" onclick="editTimeSlot(this)" value="10:30-21:30" readonly>
+				</div>
+			<!--	<div class="form-row">
+					<label>收款户名</label>
+					<input type="text" id="">
+				</div>
+				<div class="form-row">
+					<label>收款账号</label>
+					<input type="text" id="">
+				</div>
+				<div class="form-row">
+					<label>开户银行</label>
+					<input type="text" id="">
+				</div>-->
+			</div>
+			
+			<div class="pic-upload ui-radius-6 ui-border">
+				<div class="pic-form" id="store_img" value="上传店面照片" imgid="imgUrl"><p>上传店面照片</p></div>
+				<div class="btn-group" id="store_img_select">
+                    <a  class="btn ui-border ui-icon-photo ui-icon-left" onclick="camera(this)">拍照上传</a>
+                  	<a  class="btn ui-border ui-icon-upload ui-icon-left" onclick="choosePhoto(this)">本地上传</a>
+                </div>
+                <div class="btn-group"  id="store_img_delete" style="display: none">
+                    <a class="btn ui-border ui-icon-delete ui-icon-left" onclick="deleteImg(this)">删除图片</a>
+                </div>
+			</div>
+            <div class="pic-upload ui-radius-6 ui-border">
+                <div class="pic-form" id="license_img" value="上传营业执照" imgid="licenseUrl"><p>上传营业执照</p></div>
+                <div class="btn-group" id="license_select_img">
+                    <a class="btn ui-border ui-icon-photo ui-icon-left" onClick="camera(this)">拍照上传</a>
+                    <a class="btn ui-border ui-icon-upload ui-icon-left" onClick="choosePhoto(this)">本地上传</a>
+                </div>
+                <div class="btn-group" id="license_delete_img" style="display: none">
+                    <a class="btn ui-border ui-icon-delete ui-icon-left" onclick="deleteImg(this)">删除图片</a>
+                </div>
+            </div>
+            <div class="pic-upload ui-radius-6 ui-border">
+                <div class="pic-form" id="healthLicense_img" value="上传卫生许可证" imgid="healthLicenseUrl"><p>上传卫生许可证</p></div>
+                <div class="btn-group" id="healthLicenseUrl_select_img">
+                    <a class="btn ui-border ui-icon-photo ui-icon-left" onClick="camera(this)">拍照上传</a>
+                    <a class="btn ui-border ui-icon-upload ui-icon-left" onClick="choosePhoto(this)">本地上传</a>
+                </div>
+                <div class="btn-group" id="bizLog_delete_img" style="display: none">
+                    <a class="btn ui-border ui-icon-delete ui-icon-left" onclick="deleteImg(this)">删除图片</a>
+                </div>
+            </div>
+        <!--    <div style="display:none">
+			<label class="label-block"><input type="checkbox" id="isSupportVipQrOrder" onchange="showForm(this)" for="order">提供VIP点餐服务</label>
+			<div class="form ui-radius-6 ui-border" id="order" style="display:none">
+			&lt;!&ndash;	<div class="form-row">
+					<label>*消费时间</label>
+					<input type="text" id="vipOrderTime" onclick="editTimeSlot(this)" readonly>
+				</div>&ndash;&gt;
+				<div class="form-row">
+					<label>点餐公告</label>
+					<input type="text"  id="vipOrderNotice" >
+				</div>
+				<div class="form-row">
+					<label style="background:#fff;border:none;"><input type="checkbox" id="isSupportShopPayment" checked onchange="setChecked(payOnline,this)">支持到店支付</label>
+					<label style="background:#fff;border:none;"><input type="checkbox" id="isSupportOnlinePayment" onchange="setChecked(payScene,this)">支持线上支付</label>
+				</div>
+			</div>
+
+			<label class="label-block"><input type="checkbox" id="isSupportOutsell" onchange="showForm(this)" for="takeOut">提供外卖服务</label>
+			<div class="form ui-radius-6 ui-border" id="takeOut" style="display:none">
+				<div class="form-row">
+					<label>*外卖时间</label>
+					<input type="text" id="outSellTime" onclick="editTimeSlot(this)" readonly>
+				</div>
+				<div class="form-row">
+					<label>起步价</label>
+					<input type="number" id="outSellBasePrice">
+				</div>
+				<div class="form-row">
+					<label>配送费</label>
+					<input type="number" id="outSellDeliveryPrice">
+				</div>
+				<div class="form-row">
+					<label>免配送费总价</label>
+					<input type="number" id="outSellDelivertFreePrice">
+				</div>
+				<div class="form-row">
+					<label>外卖公告</label>
+					<input type="text" id="outSellNotice">
+				</div>
+			</div>
+
+			<label class="label-block"><input type="checkbox" id="isSupportReserve" onchange="showForm(this)" for="reserve">提供预订服务</label>
+			<div class="form ui-radius-6 ui-border" id="reserve" style="display:none">
+				<div class="form-row">
+					<label>*提前天数</label>
+					<input type="number" id="reservePreday">
+				</div>
+				<div class="form-row">
+					<label>预订公告</label>
+					<input type="text" id="reserveNotice">
+				</div>
+			</div>
+            </div>-->
+<!--
+			<label class="label-block"><input type="checkbox"  id="isSupportVipQrOrder">支持VIP特价</label>-->
+			
+			<a class="btn btn-block ui-heighlight ui-radius-6" onclick="submit()" style="display: none">提  交</a>
+		</div>
+		<script>
+            var provinceName="";
+            var cityName="";
+            var businessCircle="";
+
+            var cityArray=[];
+            var district2Array=[];
+            var industry2Array=[];
+
+            var label;
+            var timeLabel;
+
+            var storeId;
+
+            var provinceId;
+            var cityId;
+            var districtParentId;
+            var districtId;
+            var industryParentId;
+            var industryId;
+
+            var imgItem;
+
+            function initStoreInfo(info) {
+                var data = info;
+
+                storeId = data.id;
+                provinceId = data.provinceId;
+                cityId = data.cityId;
+                districtParentId = data.districtParentId;
+                districtId = data.districtId;
+                industryParentId = data.industryParentId;
+                industryId = data.industryId;
+
+                tagValueInit(document.body.getElementsByTagName("input"), data);
+
+                setImg(data.licenseUrl,false,document.getElementById("license_img"));
+                setImg(data.healthLicenseUrl,false,document.getElementById("healthLicense_img"));
+                setImg(data.imgUrl,false,document.getElementById("store_img"));
+            }
+            function submit(){
+                var storeInfo={};
+                storeInfo.id=storeId;
+                objPropInit(document.body.getElementsByTagName("input"),storeInfo);
+                objSelectValueInit(document.body.getElementsByTagName("select"),storeInfo);
+                objImgInit(document.getElementsByTagName("img"),storeInfo);
+
+                if(storeInfo.districtId==undefined)
+                    storeInfo.districtId=storeInfo.districtParentId;
+
+                if(isEmpty(storeInfo.name)){
+                    window.jsObj.showToastMsg("请填写店铺名称");
+                    return;
+                }
+                if(isEmpty(storeInfo.phone)){
+                    window.jsObj.showToastMsg("请填写店铺电话");
+                    return;
+                }
+                if(isEmpty(storeInfo.address)){
+                    window.jsObj.showToastMsg("请填写店铺地址");
+                    return;
+                }
+                if(storeInfo.vipOrderTime==""){
+                    window.jsObj.showToastMsg("请选择营业时间");
+                    return;
+                }
+                window.jsObj.submitInfo(JSON.stringify(storeInfo),storeInfo.id==undefined);
+            }
+            function objImgInit(imgTag,info){
+                for(var i=0; i< imgTag.length;i++){
+                    var item=imgTag[i];
+                    var prop=item.getAttribute("id");
+                    info[prop]=item.getAttribute("value");
+                }
+            }
+            function camera(item){
+                imgItem=item.parentNode;
+                window.jsObj.camera();
+            }
+            function loadIndustryInfo(info){
+                var data=eval("("+info+")");
+
+                var industry1= document.getElementById("IndustryOne");
+                industry1.innerHTML="";
+                for (var i = 0; i < data.length; i++) {
+                    industry2Array.push(data[i].subList);
+                    var ele=getElement({tag:'option',value:data[i].id,text:data[i].name});
+                    if(districtParentId==ele.value) {
+                        ele.selected = true;
+                        industryParentId="";
+                    }
+                    industry1.appendChild(ele);
+                }
+                updateIndustryTwoInfo();
+            }
+            function updateIndustryTwoInfo(){
+                var industry2Data=industry2Array[document.getElementById("IndustryOne").selectedIndex];
+
+                var district2= document.getElementById("industryId");
+                district2.innerHTML="";
+                for (var i = 0; i < industry2Data.length; i++) {
+                    var ele = getElement({tag: 'option', value: industry2Data[i].id, text: industry2Data[i].name});
+                    if (industryId == ele.value) {
+                        industryId = "";
+                        ele.selected = true;
+                    }
+                    district2.appendChild(ele);
+                }
+            }
+            function choosePhoto(item){
+                imgItem=item.parentNode;
+                window.jsObj.choosePhoto();
+            }
+            function setImg(logUrl,isUploading,item) {
+                var imgDiv;
+                if(item!=undefined)
+                    imgDiv=item;
+                else if(imgItem!=undefined)
+                    imgDiv=imgItem.previousElementSibling;
+                else
+                    return;
+
+                imgDiv.innerHTML="";
+                if(logUrl!=undefined&&typeof (logUrl)!=undefined &&logUrl!=null &&logUrl!=""){
+                    imgDiv.className=isUploading?"pic-form uploading":"pic-form";
+
+                    var img = document.createElement("img");
+                    img.setAttribute("src",logUrl);
+                    img.setAttribute("value",isUploading?"":logUrl);
+                    img.setAttribute("id",imgDiv.getAttribute("imgid"));
+
+                    imgDiv.appendChild(img);
+                    imgDiv.nextElementSibling.style.display = "none";
+                    imgDiv.nextElementSibling.nextElementSibling.style.display = "block";
+                }else{
+                    imgDiv.className="pic-form";
+                    imgDiv.appendChild(getElement({tag:'p',text:imgDiv.getAttribute("value")}));
+
+                  //  imgDiv.innerHTML="<p>上传店面照片</p>";
+                    imgDiv.nextElementSibling.style.display= "block";
+                    imgDiv.nextElementSibling.nextElementSibling.style.display = "none";
+                }
+            }
+
+            function deleteImg(item){
+                var previousItem=item.parentNode.parentNode.firstElementChild;
+                previousItem.innerHTML="";
+                previousItem.appendChild(getElement({tag:'p',text:previousItem.getAttribute("value")}));
+
+                item.parentNode.previousElementSibling.style.display = "block";
+                item.parentNode.style.display = "none";
+            }
+
+            function imgUploadComplete(srcUrl,url){
+                var item= getImgDivBySrc(srcUrl);
+                item.parentNode.className="pic-form";
+                item.setAttribute("value",url);
+            }
+            function imgUploadFailure(){
+                var imgDiv=imgItem.previousElementSibling;
+                imgDiv.className="pic-form";
+                imgDiv.innerHTML="";
+                imgDiv.appendChild(getElement({tag:'p',text:imgDiv.getAttribute("value")}));
+
+                imgItem.style.display = "block";
+                imgItem.nextElementSibling.style.display = "none";
+            }
+            function getLocationFailure(){
+                document.getElementById("getLocationBtn").disabled=false;
+                document.getElementById("getLocationBtn").value="定位失败";
+            }
+            function updateAddressPoint(address,latitude,longitude){
+                document.getElementById("address").value = address;
+                document.getElementById("latitude").value=latitude;
+                document.getElementById("longitude").value=longitude;
+            }
+            function editTimeSlot(item){
+                timeLabel=item;
+                window.jsObj.editTimeSlot(item.value);
+            }
+            function updateTimeSlot(value){
+                timeLabel.value=value;
+            }
+            function getLocation(){
+                document.getElementById("getLocationBtn").disabled=true;
+                document.getElementById("getLocationBtn").value="定位中...";
+                document.getElementById("otherPoint").style.display="none";
+                window.jsObj.getLocation();
+            }
+            function updateAddress(province,city,district,busCircle,latitude,longitude,isShowOtherPoint) {
+                document.getElementById("getLocationBtn").disabled=false;
+                document.getElementById("getLocationBtn").value="定位";
+                document.getElementById("latitude").value=latitude;
+                document.getElementById("longitude").value=longitude;
+
+                document.getElementById("address").value = district;
+
+                provinceName = province;
+                cityName = city;
+                businessCircle=busCircle;
+
+                if (cityArray.length > 0) {
+                    selectOptionItem(document.getElementById("provinceId"),province);
+                    updateCityInfo();
+                }
+                document.getElementById("otherPoint").style.display=isShowOtherPoint?"table-cell":"none";
+
+            }
+            function selectOptionItem(selectItem,value){
+                for (var i = 0; i < selectItem.options.length; i++) {
+                    if (isSameArea(value,selectItem.options[i].text)) {
+                        selectItem.options[i].selected = true;
+                        break;
+                    }
+                }
+            }
+            function updateKeyWord(val){
+                document.getElementById("keyword").value=val;
+            }
+            function isSameArea(value1,value2){
+                if(value1==undefined||value2==undefined||value1.length==0||value2.length==0)
+                    return false;
+                var length=Math.min(value1.length,value2.length);
+
+                return value1.substring(0,length)==value2.substring(0,length);
+            }
+            function setChecked(el,t){
+            	if(!t.checked){
+            		el.checked=true;
+            	}
+            }
+
+            function initBusinessCity(pId,cId){
+                provinceId=pId;
+                cityId=cId;
+            }
+
+            function isEmpty(str){
+                return str==undefined || str.trim()=="";
+            }
+
+            function objSelectValueInit(selectTag,info){
+                for(var j=0; j< selectTag.length;j++){
+                    var selectItem=selectTag[j];
+                    var propName=selectItem.getAttribute("id");
+                    var index=selectItem.selectedIndex;
+                    if(index==-1)
+                        continue;
+                    info[propName]=selectItem.options[index].getAttribute("value");
+                }
+            }
+            function objPropInit(inputTag,info){
+                for(var i=0; i< inputTag.length;i++){
+                    var item=inputTag[i];
+                    var prop=item.getAttribute("id");
+                    var tagType=item.getAttribute("type");
+
+                    if(tagType=='checkbox')
+                        info[prop]=item.checked?1:0;
+                    else
+                        info[prop]=item.value;
+                }
+            }
+            function tagValueInit(tag,data){
+                for(var i=0; i< tag.length;i++){
+                    var item=tag[i];
+                    var prop=item.getAttribute("id");
+                    var tagType=item.getAttribute("type");
+                    var val=data[prop];
+                    if(val==undefined)
+                        continue;
+
+                    if(tagType=='checkbox'){
+                        item.checked=val==1;
+                    }else{
+                        item.value=val;
+                    }
+
+                }
+            }
+            function selectTime(item){
+                label=item;
+                window.jsObj.selectTime();
+            }
+            function timeResult(time){
+                label.value=time;
+            }
+
+		    function showForm(t) {
+		    	var f=t.getAttribute("for");
+		    	var targe=document.getElementById(f);
+		    	if (t.checked){
+		    		targe.style.display="block";
+		    	}else{
+		    		targe.style.display="none";
+		    	}
+		    };
+
+		    function editKeyWord(t){
+			    var	html='<div class="dialog ui-border ui-radius-6">'+
+	            '<a class="btn-close" onclick="comitTags('+t.id+')">×</a>'+
+	            '<h3 class="dialog-title">编辑关键词</h3>'+
+	            '<div class="dialog-content"><div id="tag-content">'+
+	            '</div><div class="dialog-input-group ui-border ui-radius-6">'+
+	            '<input type="text" id="keyword_input"><a class="btn" for="keyword_input" style="color:#555555;font-size:x-large;" onclick="addKeyWord(this)">+</a></div></div></div>';
+
+                var ele= document.createElement("div");
+                ele.setAttribute("id","overlay");
+                ele.innerHTML=html;
+
+                document.body.appendChild(ele);
+		    }
+
+		    function addKeyWord(t){
+		    	var id=t.getAttribute("for");
+		    	var str=document.getElementById(id).value;
+		    	if(str!=""){
+                    document.getElementById("tag-content").innerHTML+='<a class="tag" onclick="removeTag(this)">'+str+'</a>';
+		    		document.getElementById(id).value="";
+		    	}
+                document.getElementById(id).focus();
+		    }
+
+		    function editTime(t){
+                var obj={tag:"div",id:"overlay",child:[
+                    {tag:"div",class:"dialog ui-border ui-radius-6",child:[
+                        {tag:"a",class:"btn-close",onclick:"comitTags("+ t.id+")",text:'×'},
+                        {tag:"h3",class:"dialog-title",text:'编辑时间'},
+                        {tag:"div",class:"dialog-content",child:[
+                            {tag:"div",id:"tag-content"},
+                            {tag:"div",class:"dialog-input-group ui-border ui-radius-6",child:[
+                                {tag:"input",id:"time1",onclick:"selectTime(this)",type:'text',readonly:true},
+                                {tag:"span",class:"board",text:"至"},
+                                {tag:"input",id:"time2",onclick:"selectTime(this)",type:'text',readonly:true},
+                                {tag:"a",class:"btn",for:"time",onclick:"addTime(this)",text:'+',style:"color:#555555;font-size:x-large;"}
+                            ]}
+                        ]}
+                    ]}
+                ]};
+
+                document.body.appendChild(getElement(obj));
+		    }
+
+            function getElement(obj){
+                var ele;
+
+                if(obj.tag==undefined)
+                    return;
+
+                ele= document.createElement(obj.tag);
+                for(var prop in obj){
+                    var propVal= obj[prop];
+                    if(propVal==undefined||prop=='child'||prop=="text"||prop=='tag')
+                        continue;
+                    ele.setAttribute(prop,propVal);
+                }
+                var text=obj['text'];
+                if(text!=undefined){
+                    ele.innerText=text;
+                }
+
+                var child=obj['child'];
+                if(child!=undefined){
+                    for(var i in child){
+                        ele.appendChild(getElement(child[i]));
+                    }
+                }
+
+                return ele;
+            }
+
+		    function addTime(t){
+		    	var id=t.getAttribute("for");
+		    	var str=document.getElementById(id+"1").value+'-'+document.getElementById(id+"2").value;
+		    	if(str!=""){
+                    var time= document.createElement("a");
+                    time.setAttribute("class","tag");
+                    time.setAttribute("onclick","removeTag(this)");
+                    time.innerText=str;
+
+                    document.getElementById("tag-content").appendChild(time);
+
+		    		document.getElementById(id+"1").value="";
+		    		document.getElementById(id+"2").value="";
+		    	}
+		    }
+
+		    function comitTags(item){
+		    	var v="";
+		    	var tag=document.getElementById("tag-content").getElementsByTagName("a");   
+		    	for(var i=0;i<tag.length;i++){
+		    		if(i>0){
+		    			v=v+"，"+tag[i].innerHTML;
+		    		}else{
+		    			v=v+tag[i].innerHTML;
+		    		}
+		    	}
+                item.value=v;
+               // item.setAttribute("value",v);
+
+		    	closeDialog();
+		    }
+
+		    function removeTag(t){
+                t.outerHTML="";
+		    }
+
+		    function closeDialog(){
+                document.getElementById("overlay").outerHTML="";
+		    }
+
+            function loadProvinceInfo(info){
+                var data=eval("("+info+")");
+
+                var province= document.getElementById("provinceId");
+                for (var i = 0; i < data.length; i++) {
+                    cityArray.push(data[i].subList);
+                    var ele=getElement({tag:'option',value:data[i].id,text:data[i].name});
+                    if(provinceId==ele.value) {
+                        ele.selected = true;
+                        provinceId="";
+                    }
+                    province.appendChild(ele);
+                }
+
+                updateCityInfo();
+            }
+
+            function updateCityInfo(){
+                var cityData=cityArray[document.getElementById("provinceId").selectedIndex];
+
+                var city= document.getElementById("cityId");
+                city.innerHTML="";
+                for (var i = 0; i < cityData.length; i++) {
+                    var ele={tag:'option',value:cityData[i].id,text:cityData[i].name};
+                    if(isSameArea(cityName,cityData[i].name))
+                        ele.selected=true;
+                    if(cityId==ele.value){
+                        ele.selected=true;
+                        cityId="";
+                    }
+                    city.appendChild(getElement(ele));
+                }
+                loadDistrictInfo();
+            }
+            function loadDistrictInfo(){
+                var city=document.getElementById("cityId");
+                var cityId=city.options[city.selectedIndex].getAttribute("value");
+
+                window.jsObj.loadDistrictInfo(parseInt(cityId));
+            }
+
+            function updateDistrictInfo(info){
+                var data=eval("("+info+")");
+
+                var district= document.getElementById("districtParentId");
+                district.innerHTML="";
+                district2Array.splice(0,district2Array.length);
+                for (var i = 0; i < data.length; i++) {
+                    var district2Data=data[i].subList;
+                    district2Array.push(district2Data);
+                    for (var j = 0; j < district2Data.length; j++) {
+                        if(isSameArea(district2Data[j].name,businessCircle)){
+                            districtParentId=data[i].id;
+                            break;
+                        }
+                    }
+                    var ele= getElement({tag:'option',value:data[i].id,text:data[i].name});
+                    if(districtParentId==ele.value){
+                        ele.selected=true;
+                        districtParentId="";
+                    }
+
+                    district.appendChild(ele);
+                }
+
+                updateDistrict2();
+            }
+            function updateDistrict2(){
+                var district2Data=district2Array[document.getElementById("districtParentId").selectedIndex];
+
+                var district2= document.getElementById("districtId");
+                district2.innerHTML="";
+                for (var i = 0; i < district2Data.length; i++) {
+                    if(isSameArea(district2Data[i].name,businessCircle))
+                        districtId=district2Data[i].id;
+                    var ele= getElement({tag:'option',value:district2Data[i].id,text:district2Data[i].name});
+                    if(districtId==ele.value){
+                        ele.selected=true;
+                        districtId="";
+                    }
+                    district2.appendChild(ele);
+                }
+            }
+            function getImgDivBySrc(logUrl){
+                var imgs= document.body.getElementsByTagName("img");
+                var divItem;
+                for(var i=0;i<imgs.length;i++){
+                    var item=imgs[i];
+                    var src=item.getAttribute("src");
+                    if(src!=undefined&&src==logUrl){
+                        divItem=item;
+                        break;
+                    }
+                }
+                return divItem;
+            }
+		</script>
+	</body>
+</html>

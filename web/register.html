@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <title>用户注册</title>
+</head>
+
+<body onload="loadComplete()">
+<div class="container" id="bizInfo">
+    <div class="form ui-radius-6 ui-border">
+        <div class="form-row">
+            <label>*店铺名称</label>
+            <input type="text" id="name">
+        </div>
+        <div class="form-row">
+            <label>*店铺电话</label>
+            <input type="number" id="phone" >
+        </div>
+        <div class="form-row">
+            <label>店铺类别</label>
+            <select id="IndustryOne" onchange="updateIndustryTwoInfo()"></select>
+            <select id="industryId"></select>
+        </div>
+        <div class="form-row">
+            <label>所在城市</label>
+            <select id="provinceId" onchange="updateCityInfo()"></select>
+            <select id="cityId" onchange="loadDistrictInfo()"></select>
+        </div>
+        <div class="form-row">
+            <label>所在商圈</label>
+            <select id="districtParentId" onchange="updateDistrict2()"></select>
+            <select id="districtId"></select>
+        </div>
+        <div class="form-row">
+            <label>详细地址</label>
+            <input type="text" id="address">
+
+                <input id="getLocationBtn" type="button" onclick="getLocation()" value="定位" style="padding: 5px;"/>
+                 <input id="otherPoint" type="button" onclick="window.jsObj.chooseOtherPoint()" value="其他位置" style="padding: 5px;margin: 5px;display: none"/>
+
+            <input type="text" id="latitude" hidden="">
+            <input type="text" id="longitude" hidden="">
+        </div>
+        <div class="form-row">
+            <label>店铺简介</label>
+            <input type="text" id="describe">
+        </div>
+        <div class="form-row">
+            <label>关键词</label>
+            <input type="text" class="ui-icon-right ui-icon-edit" id="keyword" onclick="window.jsObj.keyWordEdit(this.value)" readonly>
+        </div>
+        <div class="form-row">
+            <label>*营业时间</label>
+            <input type="text" id="vipOrderTime" onclick="window.jsObj.editTimeSlot(this.value)" value="10:30-21:30" readonly>
+        </div>
+
+    </div>
+
+    <div class="pic-upload ui-radius-6 ui-border">
+        <div class="pic-form" id="store_img" value="上传店面照片" imgid="imgUrl"><p>上传店面照片</p></div>
+        <div class="btn-group" id="store_img_select">
+            <a  class="btn ui-border ui-icon-photo ui-icon-left" onclick="camera(this)">拍照上传</a>
+            <a  class="btn ui-border ui-icon-upload ui-icon-left" onclick="choosePhoto(this)">本地上传</a>
+        </div>
+        <div class="btn-group"  id="store_img_delete" style="display: none">
+            <a class="btn ui-border ui-icon-delete ui-icon-left" onclick="deleteImg(this)">删除图片</a>
+        </div>
+    </div>
+    <div class="pic-upload ui-radius-6 ui-border">
+        <div class="pic-form" id="license_img" value="上传营业执照" imgid="licenseUrl"><p>上传营业执照</p></div>
+        <div class="btn-group" id="license_select_img">
+            <a class="btn ui-border ui-icon-photo ui-icon-left" onClick="camera(this)">拍照上传</a>
+            <a class="btn ui-border ui-icon-upload ui-icon-left" onClick="choosePhoto(this)">本地上传</a>
+        </div>
+        <div class="btn-group" id="license_delete_img" style="display: none">
+            <a class="btn ui-border ui-icon-delete ui-icon-left" onclick="deleteImg(this)">删除图片</a>
+        </div>
+    </div>
+    <div class="pic-upload ui-radius-6 ui-border">
+        <div class="pic-form" id="healthLicense_img" value="上传卫生许可证" imgid="healthLicenseUrl"><p>上传卫生许可证</p></div>
+        <div class="btn-group" id="healthLicenseUrl_select_img">
+            <a class="btn ui-border ui-icon-photo ui-icon-left" onClick="camera(this)">拍照上传</a>
+            <a class="btn ui-border ui-icon-upload ui-icon-left" onClick="choosePhoto(this)">本地上传</a>
+        </div>
+        <div class="btn-group" id="bizLog_delete_img" style="display: none">
+            <a class="btn ui-border ui-icon-delete ui-icon-left" onclick="deleteImg(this)">删除图片</a>
+        </div>
+    </div>
+
+    <div class="form ui-radius-6 ui-border">
+        <div class="form-row">
+            <label>*联系手机</label>
+            <input type="number" id="contactPhone">
+            <span  class="board">
+                <input id="getCheckCode" type="button" onclick="getCheckCode()" value="获取校验码" style="padding: 5px;margin-right: 5px"/>
+            </span>
+        </div>
+        <div class="form-row">
+            <label>*校验码</label>
+            <input type="number" id="checkCode">
+        </div>
+        <div class="form-row">
+            <label>*登录密码</label>
+            <input type="text" id="password">
+        </div>
+        <div class="form-row">
+            <label class="label-block" style="border-right: 0px;"><input type="checkbox" checked="true" id="agreement">我已阅读并同意街邻网<a href="#agreement-modal" onclick="showDialog()">《商户注册协议》</a></label>
+        </div>
+        </div>
+</div>
+
+<div id="overlay" style="display:none">
+    <div class="dialog ui-border ui-radius-6">
+        <a class="btn-close" onclick="closeDialog()">×</a>
+        <h3 class="dialog-title">商户注册协议</h3>
+        <div class="dialog-content">
+            <ol>
+                    <li><h5>头部及导言</h5>
+
+                        <p>
+                            珠海街邻网络有限公司（以下简称“街邻网”）同意按照本协议的规定及其不时发布的操作规则提供基于互联网的相关服务（以下称“网络服务”），为获得网络服务，服务使用人（以下称“商户”）应当同意本协议的全部条款并按照页面上的提示完成全部的注册程序。商户在进行注册程序过程中点击"同意"按钮即表示商户完全接受本协议项下的全部条款。</p>
+                    </li>
+                    <li><h5>服务内容</h5>
+                        <ol>
+                            <li><p>街邻网服务的具体内容由街邻网根据实际情况提供。街邻网保留随时变更、中断或终止部分或全部网络服务的权利。</p></li>
+                            <li><p>
+                                街邻网在提供网络服务时，可能会对部分网络服务的商户收取一定的费用。在此情况下，街邻网会在相关页面上做明确的提示。如商户拒绝支付该等费用，则不能使用相关的网络服务。</p>
+                            </li>
+                            <li><p>
+                                街邻网仅提供相关的网络服务，除此之外与相关网络服务有关的设备（如平板电脑、打印机、调制解调器及其他与接入互联网有关的装置）及所需的费用（如为接入互联网而支付的电话费及上网费）均应由商户自行负担。</p>
+                            </li>
+                        </ol>
+                    </li>
+                    <li><h5>使用规则</h5>
+                        <ol>
+                            <li><p>商户在申请使用街邻网服务时，必须向街邻网提供准确的公司资料，如公司资料有任何变动，请务必及时书面通知街邻网更新。</p></li>
+                            <li><p>商户注册成功后，街邻网将给予每个商户一个商户帐号及相应的密码，该商户帐号和密码由商户负责保管；商户应当对以其商户帐号进行的所有活动和事件负法律责任。</p></li>
+                            <li><p>商户必须同意接受街邻网通过电子邮件或其他方式向商户发送的商品促销或其他相关商业信息。</p></li>
+                            <li><p>商户在使用街邻网服务过程中，必须遵循以下原则：</p>
+                                <ul>
+                                    <li>遵守中国有关的法律和法规；</li>
+                                    <li>不得为任何非法目的而使用网络服务系统；</li>
+                                    <li>遵守所有与网络服务有关的网络协议、规定和程序；</li>
+                                    <li>不得利用街邻网服务系统进行任何可能对互联网的正常运转造成不利影响的行为；</li>
+                                    <li>不得利用街邻网服务系统传输任何骚扰性的、中伤他人的、辱骂性的、恐吓性的、庸俗淫秽的或其他任何非法的信息资料；</li>
+                                    <li>不得利用街邻网服务系统进行任何不利于街邻网的行为；</li>
+                                    <li>如发现任何非法使用商户帐号或帐号出现安全漏洞的情况，应立即通告街邻网。</li>
+                                </ul>
+                            </li>
+                            <li><p>
+                                如商户在使用网络服务时违反任何上述规定，街邻网或及其授权的人有权要求商户改正或直接采取一切必要的措施（包括但不限于更改或删除商户张贴的内容等、暂停或终止商户使用网络服务的权利）以减轻商户不当行为造成的影响。</p>
+                            </li>
+                        </ol>
+                    </li>
+                    <li><h5>内容所有权</h5>
+                        <ol>
+                            <li><p>街邻网提供的网络服务内容可能包括：文字、软件、声音、图片、录象、图表等。所有这些内容受版权、商标和其它财产所有权的法律保护。</p></li>
+                            <li><p>商户只有在获得街邻网或其他相关权利人的授权之后才能使用这些内容，而且不能擅自复制、再造这些内容、或创造与内容有关的派生产品。</p></li>
+                        </ol>
+                    </li>
+                    <li><h5>隐私保护</h5>
+                        <ol>
+                            <li><p>保护商户隐私是街邻网的一项基本政策，街邻网保证不对外公开或向第三方提供商户注册资料及商户在使用网络服务时存储在街邻网的非公开内容，但下列情况除外：</p>
+                                <ul>
+                                    <li>事先获得商户的明确授权；</li>
+                                    <li>根据有关的法律法规要求；</li>
+                                    <li>按照相关政府主管部门的要求；</li>
+                                    <li>为维护社会公众的利益；</li>
+                                    <li>为维护街邻网的合法权益。</li>
+                                </ul>
+                            </li>
+                            <li><p>
+                                街邻网可能会与第三方合作向商户提供相关的网络服务，在此情况下，如该第三方同意承担与街邻网同等的保护商户隐私的责任，则街邻网可将商户的注册资料等提供给该第三方。</p>
+                            </li>
+                            <li><p>在不透露单个商户隐私资料的前提下，街邻网有权对整个商户数据库进行分析并对商户数据库进行商业上的利用。</p></li>
+                        </ol>
+                    </li>
+                    <li><h5>免责声明</h5>
+                        <ol>
+                            <li><p>商户明确同意其使用街邻网服务所存在的风险将完全由其自己承担；因其使用街邻网服务而产生的一切后果也由其自己承担，街邻网对商户不承担任何责任。</p></li>
+                            <li><p>街邻网不担保网络服务一定能满足商户的要求，也不担保网络服务不会中断，对网络服务的及时性、安全性、准确性也都不作担保。</p></li>
+                            <li><p>街邻网不保证为向商户提供便利而设置的外部链接的准确性和完整性，同时，对于该等外部链接指向的不由街邻网实际控制的任何网页上的内容，街邻网不承担任何责任。 </p>
+                            </li>
+                            <li><p>对于因不可抗力或街邻网不能控制的原因造成的网络服务中断或其它缺陷，街邻网不承担任何责任，但将尽力减少因此而给商户造成的损失和影响。</p></li>
+                        </ol>
+                    </li>
+                    <li><h5>服务变更、中断或终止</h5>
+                        <ol>
+                            <li><p>如因系统维护或升级的需要而需暂停网络服务，街邻网将尽可能事先进行通告。</p></li>
+                            <li><p>如发生下列任何一种情形，街邻网有权随时中断或终止向商户提供本协议项下的网络服务而无需通知商户：</p>
+                                <ul>
+                                    <li>商户提供的个人资料不真实；</li>
+                                    <li>商户违反本协议中规定的使用规则。</li>
+                                </ul>
+                            </li>
+                            <li><p>
+                                除前款所述情形外，街邻网同时保留在不事先通知商户的情况下随时中断或终止部分或全部网络服务的权利，对于所有服务的中断或终止而造成的任何损失，街邻网无需对商户或任何第三方承担任何责任。</p>
+                            </li>
+                        </ol>
+                    </li>
+                    <li><h5>违约赔偿</h5>
+                        <ol>
+                            <li><p>
+                                商户同意保障和维护街邻网及其他商户的利益，如因商户违反有关法律、法规或本协议项下的任何条款而给街邻网或任何其他第三人造成损失，商户同意承担由此造成的损害赔偿责任。</p>
+                            </li>
+                        </ol>
+                    </li>
+                    <li><h5>协议修改</h5>
+                        <ol>
+                            <li><p>街邻网将有权随时修改本协议的有关条款，一旦本协议的内容发生变动，街邻网将会通过适当方式向商户提示修改内容。</p></li>
+                            <li><p>如果不同意街邻网对本协议相关条款所做的修改，商户有权停止使用网络服务。如果商户继续使用网络服务，则视为商户接受街邻网对本协议相关条款所做的修改。</p></li>
+                        </ol>
+                    </li>
+                    <li><h5>法律管辖</h5>
+                        <ol>
+                            <li><p>本协议的订立、执行和解释及争议的解决均应适用中国法律。</p></li>
+                            <li><p>如双方就本协议内容或其执行发生任何争议，双方应尽量友好协商解决；协商不成时，任何一方均可向街邻网所在地的人民法院提起诉讼。</p></li>
+                        </ol>
+                    </li>
+                    <li><h5>通知和送达</h5>
+                        <ol>
+                            <li><p>本协议项下所有的通知均可通过重要页面公告、电子邮件或常规的信件传送等方式进行；该等通知于发送之日视为已送达收件人。</p></li>
+                        </ol>
+                    </li>
+                    <li><h5>其他规定</h5>
+                        <ol>
+                            <li><p>本协议构成双方对本协议之约定事项及其他有关事宜的完整协议，除本协议规定的之外，未赋予本协议各方其他权利。</p></li>
+                            <li><p>如本协议中的任何条款无论因何种原因完全或部分无效或不具有执行力，本协议的其余条款仍应有效并且有约束力。</p></li>
+                            <li><p>本协议中的标题仅为方便而设，在解释本协议时应被忽略。</p></li>
+                        </ol>
+                    </li>
+                </ol>
+        </div>
+    </div>
+</div>
+<script>
+    var provinceName="广东";
+    var cityName="珠海";
+    var businessCircle="";
+    var districtParentId;
+    var districtId;
+
+    var cityArray=[];
+    var district2Array=[];
+    var industry2Array=[];
+
+    var label;
+    var imgItem;
+
+    function camera(item){
+        imgItem=item.parentNode;
+        window.jsObj.camera();
+    }
+    function choosePhoto(item){
+        imgItem=item.parentNode;
+        window.jsObj.choosePhoto();
+    }
+    function updateTimeSlot(value){
+        document.getElementById("vipOrderTime").value=value;
+    }
+
+    function loadComplete(){
+        document.getElementById("getLocationBtn").click();
+    }
+
+    function getLocation(){
+        document.getElementById("getLocationBtn").disabled=true;
+        document.getElementById("getLocationBtn").value="定位中...";
+        document.getElementById("otherPoint").style.display="none";
+        window.jsObj.getLocation();
+    }
+    function getCheckCode(){
+        var phone= document.getElementById("contactPhone").value;
+
+        if(phone==""||phone.trim().length!=11){
+            window.jsObj.showToastMsg("联系手机输入不正确");
+        }else
+            window.jsObj.getCheckCode(phone);
+    }
+    function updateGetCheckCodeButton() {
+        var ele = document.getElementById("getCheckCode");
+        var num = 60;
+        ele.disabled = true;
+        ele.value = num + "秒后重新获取";
+        var id = setInterval(function () {
+            --num;
+            ele.value = num + "秒后重新获取";
+            console.info(num + "");
+            if (num <= 0) {
+                ele.disabled = false;
+                ele.value = "获取校验码";
+                clearInterval(id);
+            }
+
+        }, 1000);
+    }
+    function getLocationFailure(){
+        document.getElementById("getLocationBtn").disabled=false;
+        document.getElementById("getLocationBtn").value="定位失败";
+    }
+    function updateAddressPoint(address,latitude,longitude){
+        document.getElementById("address").value = address;
+        document.getElementById("latitude").value=latitude;
+        document.getElementById("longitude").value=longitude;
+    }
+    function updateAddress(province,city,district,busCircle,latitude,longitude,isShowOtherPoint) {
+        document.getElementById("getLocationBtn").disabled=false;
+        document.getElementById("getLocationBtn").value="定位";
+        document.getElementById("latitude").value=latitude;
+        document.getElementById("longitude").value=longitude;
+
+        document.getElementById("address").value = district;
+
+        provinceName = province;
+        cityName = city;
+        businessCircle=busCircle;
+
+        if (cityArray.length > 0) {
+            selectOptionItem(document.getElementById("provinceId"),province);
+            updateCityInfo();
+        }
+        document.getElementById("otherPoint").style.display=isShowOtherPoint?"table-cell":"none";
+
+    }
+
+    function isSameArea(value1,value2){
+        if(value1==undefined||value2==undefined||value1.length==0||value2.length==0)
+            return false;
+        var length=Math.min(value1.length,value2.length);
+
+        return value1.substring(0,length)==value2.substring(0,length);
+    }
+    function selectOptionItem(selectItem,value){
+        for (var i = 0; i < selectItem.options.length; i++) {
+            if (isSameArea(value,selectItem.options[i].text)) {
+                selectItem.options[i].selected = true;
+                break;
+            }
+        }
+    }
+    function objImgInit(imgTag,info){
+        for(var i=0; i< imgTag.length;i++){
+            var item=imgTag[i];
+            var prop=item.getAttribute("id");
+            info[prop]=item.getAttribute("value");
+        }
+    }
+    function submitInfo(){
+        var obj={};
+
+        objPropInit(document.getElementsByTagName("input"),obj);
+        objSelectValueInit(document.body.getElementsByTagName("select"),obj);
+        objImgInit(document.getElementsByTagName("img"),obj);
+
+        if(obj.districtId==undefined)
+            obj.districtId=obj.districtParentId;
+
+        var result =true;
+        if(obj.name==""){
+            window.jsObj.showToastMsg("店铺名称不能为空");
+            result =false;
+        }else if(obj.phone==""){
+            window.jsObj.showToastMsg("店铺电话不能为空");
+            result =false;
+        }else if(obj.address==""){
+            window.jsObj.showToastMsg("详细地址不能为空");
+            result =false;
+        }else if(obj.password==""){
+            window.jsObj.showToastMsg("密码不能为空");
+            result =false;
+        }else if(obj.password.length<6){
+            window.jsObj.showToastMsg("密码不能小于6位数");
+            result =false;
+        }else if(obj.contactPhone==""){
+            window.jsObj.showToastMsg("联系手机不能为空");
+            result =false;
+        }else if(!obj.agreement){
+            window.jsObj.showToastMsg("请同意街邻网《商户注册协议》");
+            result =false;
+        }
+
+        if(result){
+            window.jsObj.submitInfo(JSON.stringify(obj),obj.password,obj.contactPhone,obj.checkCode);
+        }
+    }
+    function selectTime(item){
+        label=item;
+        window.jsObj.selectTime();
+    }
+    function timeResult(time){
+        label.value=time;
+    }
+
+    function showDialog(){
+        document.getElementById("overlay").style.display="block";
+    }
+
+    function closeDialog(){
+        document.getElementById("overlay").style.display="none";
+    }
+    function editKeyWord(item){
+        window.jsObj.selectTime(item.value);
+    }
+    function updateKeyWord(val){
+        document.getElementById("keyword").value=val;
+    }
+
+    function loadProvinceInfo(info){
+        var data=eval("("+info+")");
+
+        var province= document.getElementById("provinceId");
+        for (var i = 0; i < data.length; i++) {
+            cityArray.push(data[i].subList);
+            var ele={tag:'option',value:data[i].id,text:data[i].name};
+            if(isSameArea(provinceName,data[i].name)){
+                ele.selected=true;
+            }
+            province.appendChild(getElement(ele));
+        }
+
+        updateCityInfo();
+    }
+    function objSelectValueInit(selectTag,info){
+        for(var j=0; j< selectTag.length;j++){
+            var selectItem=selectTag[j];
+            var propName=selectItem.getAttribute("id");
+            var index=selectItem.selectedIndex;
+            if(index==-1)
+                continue;
+            info[propName]=selectItem.options[index].getAttribute("value");
+        }
+    }
+    function updateCityInfo(){
+        var cityData=cityArray[document.getElementById("provinceId").selectedIndex];
+
+        var city= document.getElementById("cityId");
+        city.innerHTML="";
+        for (var i = 0; i < cityData.length; i++) {
+            var ele={tag:'option',value:cityData[i].id,text:cityData[i].name};
+            if(isSameArea(cityName,cityData[i].name))
+                ele.selected=true;
+            city.appendChild(getElement(ele));
+        }
+        loadDistrictInfo();
+    }
+    function loadDistrictInfo(){
+        var city=document.getElementById("cityId");
+        var cityId=city.options[city.selectedIndex].getAttribute("value");
+
+        window.jsObj.loadDistrictInfo(parseInt(cityId));
+    }
+    function updateDistrictInfo(info){
+        var data=eval("("+info+")");
+
+        var district= document.getElementById("districtParentId");
+        district.innerHTML="";
+        district2Array.splice(0,district2Array.length);
+        for (var i = 0; i < data.length; i++) {
+            var district2Data=data[i].subList;
+            district2Array.push(district2Data);
+            for (var j = 0; j < district2Data.length; j++) {
+                if(isSameArea(district2Data[j].name,businessCircle)){
+                    districtParentId=data[i].id;
+                    break;
+                }
+            }
+
+            district.appendChild(getElement({tag:'option',value:data[i].id,text:data[i].name}));
+        }
+
+        if(districtParentId!=null&&districtParentId!=""){
+            district.value=districtParentId;
+            districtParentId="";
+        }
+        updateDistrict2();
+    }
+    function updateDistrict2(){
+        var district2Data=district2Array[document.getElementById("districtParentId").selectedIndex];
+
+        var district2= document.getElementById("districtId");
+        district2.innerHTML="";
+        for (var i = 0; i < district2Data.length; i++) {
+            if(isSameArea(district2Data[i].name,businessCircle))
+                districtId=district2Data[i].id;
+            district2.appendChild(getElement({tag:'option',value:district2Data[i].id,text:district2Data[i].name}));
+        }
+        if(districtId!=null&&districtId!=""){
+            district2.value=districtId;
+            districtId="";
+        }
+    }
+    function loadIndustryInfo(info){
+        var data=eval("("+info+")");
+
+        var industry1= document.getElementById("IndustryOne");
+        industry1.innerHTML="";
+        for (var i = 0; i < data.length; i++) {
+            industry2Array.push(data[i].subList);
+            industry1.appendChild(getElement({tag:'option',value:data[i].id,text:data[i].name}));
+        }
+        updateIndustryTwoInfo();
+    }
+    function updateIndustryTwoInfo(){
+        var industry2Data=industry2Array[document.getElementById("IndustryOne").selectedIndex];
+
+        var district2= document.getElementById("industryId");
+        district2.innerHTML="";
+        for (var i = 0; i < industry2Data.length; i++) {
+            district2.appendChild(getElement({tag:'option',value:industry2Data[i].id,text:industry2Data[i].name}));
+        }
+    }
+
+    function getElement(obj){
+        var ele;
+
+        if(obj.tag==undefined)
+            return;
+
+        ele= document.createElement(obj.tag);
+        for(var prop in obj){
+            var propVal= obj[prop];
+            if(propVal==undefined||prop=='child'||prop=="text"||prop=='tag')
+                continue;
+            ele.setAttribute(prop,propVal);
+        }
+        var text=obj['text'];
+        if(text!=undefined){
+            ele.innerText=text;
+        }
+
+        var child=obj['child'];
+        if(child!=undefined){
+            for(var i in child){
+                ele.appendChild(getElement(child[i]));
+            }
+        }
+
+        return ele;
+    }
+
+    function isPhone(strPhone) {
+        if (strPhone.search(/^s*[A-Za-z0-9]{6,20}s*$/) != -1)
+            return true;
+        else
+            return false;
+    }
+    function isEmail(strEmail) {
+        if (strEmail.search(/^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z0-9]+$/) != -1)
+            return true;
+        else
+            return false;
+    }
+        function objPropInit(inputTag,info){
+            for(var i=0; i< inputTag.length;i++){
+                var item=inputTag[i];
+                var prop=item.getAttribute("id");
+
+                var tagType=item.getAttribute("type");
+
+                if(tagType=='checkbox')
+                    info[prop]=item.checked;
+                else if(tagType!=undefined&&tagType!='button')
+                    info[prop]=item.value;
+            }
+        }
+    function setImg(logUrl,isUploading,item) {
+        var imgDiv;
+        if(item!=undefined)
+            imgDiv=item;
+        else if(imgItem!=undefined)
+            imgDiv=imgItem.previousElementSibling;
+        else
+            return;
+
+        imgDiv.innerHTML="";
+        if(logUrl!=undefined&&typeof (logUrl)!=undefined &&logUrl!=null &&logUrl!=""){
+            imgDiv.className=isUploading?"pic-form uploading":"pic-form";
+
+            var img = document.createElement("img");
+            img.setAttribute("src",logUrl);
+            img.setAttribute("value",isUploading?"":logUrl);
+            img.setAttribute("id",imgDiv.getAttribute("imgid"));
+
+            imgDiv.appendChild(img);
+            imgDiv.nextElementSibling.style.display = "none";
+            imgDiv.nextElementSibling.nextElementSibling.style.display = "block";
+        }else{
+            imgDiv.className="pic-form";
+            imgDiv.appendChild(getElement({tag:'p',text:imgDiv.getAttribute("value")}));
+
+            //  imgDiv.innerHTML="<p>上传店面照片</p>";
+            imgDiv.nextElementSibling.style.display= "block";
+            imgDiv.nextElementSibling.nextElementSibling.style.display = "none";
+        }
+    }
+
+    function deleteImg(item){
+        var previousItem=item.parentNode.parentNode.firstElementChild;
+        previousItem.innerHTML="";
+        previousItem.appendChild(getElement({tag:'p',text:previousItem.getAttribute("value")}));
+
+        item.parentNode.previousElementSibling.style.display = "block";
+        item.parentNode.style.display = "none";
+    }
+
+    function imgUploadComplete(srcUrl,url){
+        var item= getImgDivBySrc(srcUrl);
+        item.parentNode.className="pic-form";
+        item.setAttribute("value",url);
+    }
+    function imgUploadFailure(){
+        var imgDiv=imgItem.previousElementSibling;
+        imgDiv.className="pic-form";
+        imgDiv.innerHTML="";
+        imgDiv.appendChild(getElement({tag:'p',text:imgDiv.getAttribute("value")}));
+
+        imgItem.style.display = "block";
+        imgItem.nextElementSibling.style.display = "none";
+    }
+    function getImgDivByUrl(logUrl){
+        var imgs= document.body.getElementsByTagName("img");
+        var divItem;
+        for(var i=0;i<imgs.length;i++){
+            var item=imgs[i];
+            var src=item.getAttribute("src");
+            if(src!=undefined&&src==logUrl){
+                divItem=item;
+                break;
+            }
+        }
+        return divItem;
+    }
+    function getImgDivBySrc(logUrl){
+        var imgs= document.body.getElementsByTagName("img");
+        var divItem;
+        for(var i=0;i<imgs.length;i++){
+            var item=imgs[i];
+            var src=item.getAttribute("src");
+            if(src!=undefined&&src==logUrl){
+                divItem=item;
+                break;
+            }
+        }
+        return divItem;
+    }
+</script>
+</body>
+</html>

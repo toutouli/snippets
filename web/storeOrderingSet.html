@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <title>点餐/外卖/预约设置</title>
+</head>
+
+<body>
+<div class="container">
+    <label class="label-block"><input type="checkbox" id="isSupportVipQrOrder" onchange="showForm(this)" for="order">提供VIP点餐服务</label>
+    <div class="form ui-radius-6 ui-border" id="order" style="display:none">
+        <div class="form-row">
+            <label>点餐公告</label>
+            <input type="text"  id="vipOrderNotice" >
+        </div>
+        <div class="form-row">
+            <label style="background:#fff;border:none;"><input type="checkbox" id="isSupportShopPayment" checked onchange="setChecked(isSupportOnlinePayment,this)">支持到店支付</label>
+            <label style="background:#fff;border:none;"><input type="checkbox" id="isSupportOnlinePayment" onchange="setChecked(isSupportShopPayment,this)">支持线上支付</label>
+        </div>
+    </div>
+
+    <label class="label-block"><input type="checkbox" id="isSupportOutsell" onchange="showForm(this)" for="takeOut">提供外卖服务</label>
+    <div class="form ui-radius-6 ui-border" id="takeOut" style="display:none">
+        <div class="form-row">
+            <label>*外卖时间</label>
+            <input type="text" id="outSellTime" onclick="editTimeSlot(this)" readonly>
+        </div>
+        <div class="form-row">
+            <label>外卖公告</label>
+            <input type="text" id="outSellNotice">
+        </div>
+        <div class="form-row">
+            <label>起步价</label>
+            <input type="number" id="outSellBasePrice">
+        </div>
+        <div class="form-row">
+            <label>配送费</label>
+            <input type="number" id="outSellDeliveryPrice">
+        </div>
+        <div class="form-row">
+            <label>免配送费总价</label>
+            <input type="number" id="outSellDelivertFreePrice">
+        </div>
+        <div class="form-row">
+            <label style="background:#fff;border:none;"><input type="checkbox" id="isOutsellSupportShopPayment" checked onchange="setChecked(isOutsellSupportOnlinePayment,this)">支持餐到付款</label>
+            <label style="background:#fff;border:none;"><input type="checkbox" id="isOutsellSupportOnlinePayment" onchange="setChecked(isOutsellSupportShopPayment,this)">支持线上支付</label>
+        </div>
+    </div>
+
+    <label class="label-block"><input type="checkbox" id="isSupportReserve" onchange="showForm(this)" for="reserve">提供预订服务</label>
+    <div class="form ui-radius-6 ui-border" id="reserve" style="display:none">
+        <div class="form-row">
+            <label>*提前天数</label>
+            <input type="number" id="reservePreday" value="1">
+        </div>
+        <div class="form-row">
+            <label>预订公告</label>
+            <input type="text" id="reserveNotice">
+        </div>
+    </div>
+    <!--
+                <label class="label-block"><input type="checkbox"  id="isSupportVipQrOrder">支持VIP特价</label>-->
+
+    <a class="btn btn-block ui-heighlight ui-radius-6" onclick="submit()" style="display: none">提  交</a>
+</div>
+<script>
+    var label;
+    var timeLabel;
+
+    var storeId;
+    function editTimeSlot(item){
+        timeLabel=item;
+        window.jsObj.editTimeSlot(item.value);
+    }
+    function updateTimeSlot(value){
+        timeLabel.value=value;
+    }
+    function selectOptionItem(selectItem,value){
+        for (var i = 0; i < selectItem.options.length; i++) {
+            if (isSameArea(value,selectItem.options[i].text)) {
+                selectItem.options[i].selected = true;
+                break;
+            }
+        }
+    }
+    function setChecked(el,t){
+        if(!t.checked){
+            el.checked=true;
+        }
+    }
+
+    function initStoreInfo(info){
+        var data=eval("("+info+")");
+        storeId=data.id;
+        tagValueInit(document.body.getElementsByTagName("input"),data);
+        if( data.isSupportVipQrOrder==1){
+            showForm(document.getElementById("isSupportVipQrOrder"));
+        }
+        if( data.isSupportOutsell==1){
+            showForm(document.getElementById("isSupportOutsell"));
+        }
+        if( data.isSupportQrOrder==1){
+            showForm(document.getElementById("isSupportReserve"));
+        }
+    }
+
+    function isEmpty(str){
+        return str==undefined || str.trim()=="";
+    }
+
+    function submit(){
+        var storeInfo={};
+        storeInfo.id=storeId;
+        objPropInit(document.body.getElementsByTagName("input"),storeInfo);
+      //  objSelectValueInit(document.body.getElementsByTagName("select"),storeInfo);
+
+        if(storeInfo.isSupportOutsell==1&& storeInfo.outSellTime==""){
+            window.jsObj.showToastMsg("外卖时间不能为空");
+            return;
+        }
+        if(storeInfo.isSupportQrOrder==1&& storeInfo.vipOrderTime==""){
+            window.jsObj.showToastMsg("点餐服务消费时间不能为空");
+            return;
+        }
+        if(storeInfo.isSupportReserve==1&& (storeInfo.reservePreday==""||storeInfo.reservePreday<=0)){
+            window.jsObj.showToastMsg("预约提前天数必须一天以上");
+            return;
+        }
+        window.jsObj.submitInfo(JSON.stringify(storeInfo));
+    }
+
+    function objSelectValueInit(selectTag,info){
+        for(var j=0; j< selectTag.length;j++){
+            var selectItem=selectTag[j];
+            var propName=selectItem.getAttribute("id");
+            var index=selectItem.selectedIndex;
+            if(index==-1)
+                continue;
+            info[propName]=selectItem.options[index].getAttribute("value");
+        }
+    }
+    function objPropInit(inputTag,info){
+        for(var i=0; i< inputTag.length;i++){
+            var item=inputTag[i];
+            var prop=item.getAttribute("id");
+            var tagType=item.getAttribute("type");
+
+            if(tagType=='checkbox')
+                info[prop]=item.checked?1:0;
+            else
+                info[prop]=item.value;
+        }
+    }
+    function tagValueInit(tag,data){
+        for(var i=0; i< tag.length;i++){
+            var item=tag[i];
+            var prop=item.getAttribute("id");
+            var tagType=item.getAttribute("type");
+            var val=data[prop];
+            if(val==undefined)
+                continue;
+
+            if(tagType=='checkbox'){
+                item.checked=val==1;
+            }else{
+                item.value=val;
+            }
+
+        }
+    }
+    function selectTime(item){
+        label=item;
+        window.jsObj.selectTime();
+    }
+    function timeResult(time){
+        label.value=time;
+    }
+
+    function showForm(t) {
+        var f=t.getAttribute("for");
+        var targe=document.getElementById(f);
+        if (t.checked){
+            targe.style.display="block";
+        }else{
+            targe.style.display="none";
+        }
+    };
+
+    function addKeyWord(t){
+        var id=t.getAttribute("for");
+        var str=document.getElementById(id).value;
+        if(str!=""){
+            document.getElementById("tag-content").innerHTML+='<a class="tag" onclick="removeTag(this)">'+str+'</a>';
+            document.getElementById(id).value="";
+        }
+        document.getElementById(id).focus();
+    }
+
+    function editTime(t){
+        var obj={tag:"div",id:"overlay",child:[
+            {tag:"div",class:"dialog ui-border ui-radius-6",child:[
+                {tag:"a",class:"btn-close",onclick:"comitTags("+ t.id+")",text:'×'},
+                {tag:"h3",class:"dialog-title",text:'编辑时间'},
+                {tag:"div",class:"dialog-content",child:[
+                    {tag:"div",id:"tag-content"},
+                    {tag:"div",class:"dialog-input-group ui-border ui-radius-6",child:[
+                        {tag:"input",id:"time1",onclick:"selectTime(this)",type:'text',readonly:true},
+                        {tag:"span",class:"board",text:"至"},
+                        {tag:"input",id:"time2",onclick:"selectTime(this)",type:'text',readonly:true},
+                        {tag:"a",class:"btn",for:"time",onclick:"addTime(this)",text:'+',style:"color:#555555;font-size:x-large;"}
+                    ]}
+                ]}
+            ]}
+        ]};
+
+        document.body.appendChild(getElement(obj));
+    }
+
+    function getElement(obj){
+        var ele;
+
+        if(obj.tag==undefined)
+            return;
+
+        ele= document.createElement(obj.tag);
+        for(var prop in obj){
+            var propVal= obj[prop];
+            if(propVal==undefined||prop=='child'||prop=="text"||prop=='tag')
+                continue;
+            ele.setAttribute(prop,propVal);
+        }
+        var text=obj['text'];
+        if(text!=undefined){
+            ele.innerText=text;
+        }
+
+        var child=obj['child'];
+        if(child!=undefined){
+            for(var i in child){
+                ele.appendChild(getElement(child[i]));
+            }
+        }
+
+        return ele;
+    }
+
+    function addTime(t){
+        var id=t.getAttribute("for");
+        var str=document.getElementById(id+"1").value+'-'+document.getElementById(id+"2").value;
+        if(str!=""){
+            var time= document.createElement("a");
+            time.setAttribute("class","tag");
+            time.setAttribute("onclick","removeTag(this)");
+            time.innerText=str;
+
+            document.getElementById("tag-content").appendChild(time);
+
+            document.getElementById(id+"1").value="";
+            document.getElementById(id+"2").value="";
+        }
+    }
+
+    function comitTags(item){
+        var v="";
+        var tag=document.getElementById("tag-content").getElementsByTagName("a");
+        for(var i=0;i<tag.length;i++){
+            if(i>0){
+                v=v+"，"+tag[i].innerHTML;
+            }else{
+                v=v+tag[i].innerHTML;
+            }
+        }
+        item.value=v;
+        // item.setAttribute("value",v);
+
+        closeDialog();
+    }
+
+    function removeTag(t){
+        t.outerHTML="";
+    }
+
+    function closeDialog(){
+        document.getElementById("overlay").outerHTML="";
+    }
+</script>
+</body>
+</html>

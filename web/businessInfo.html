@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <title>商家信息</title>
+</head>
+
+<body>
+<div class="container">
+    <div class="form ui-radius-6 ui-border" id="bizInfo">
+        <div class="form-row">
+            <label>商家ID</label>
+            <input type="number"  id="id" readonly>
+        </div>
+        <div class="form-row">
+            <label>商家名称</label>
+            <input type="text" id="name"  readonly>
+        </div>
+        <div class="form-row">
+            <label>注册手机</label>
+            <input type="number" id="phone">
+        </div>
+        <div class="form-row">
+            <label>联系人</label>
+            <input type="text"  id="contactsName">
+            <input type="hidden" id="contactsId">
+        </div>
+        <div class="form-row">
+            <label>法人代表</label>
+            <input type="text" id="principal">
+        </div>
+        <div class="form-row">
+            <label>身份证号</label>
+            <input type="text" id="idcard">
+        </div>
+       <!-- <div class="form-row">
+            <label>营业执照编号</label>
+            <input type="text" id="number">
+        </div>-->
+    </div>
+   <!-- <div class="pic-upload ui-radius-6 ui-border">
+        <div class="pic-form" id="license"></div>
+        <div class="btn-group" id="license_select_img">
+            <a class="btn ui-border ui-icon-photo ui-icon-left" onClick="camera(0)">拍照上传</a>
+            <a class="btn ui-border ui-icon-upload ui-icon-left" onClick="choosePhoto(0)">本地上传</a>
+        </div>
+        <div class="btn-group" id="license_delete_img">
+            <a class="btn ui-border ui-icon-delete ui-icon-left" onclick="deleteLicenseImg()">删除图片</a>
+        </div>
+    </div>
+    <div class="pic-upload ui-radius-6 ui-border">
+        <div class="pic-form" id="bizLog"></div>
+        <div class="btn-group" id="bizLog_select_img">
+            <a class="btn ui-border ui-icon-photo ui-icon-left" onClick="camera(1)">拍照上传</a>
+            <a class="btn ui-border ui-icon-upload ui-icon-left" onClick="choosePhoto(1)">本地上传</a>
+        </div>
+        <div class="btn-group" id="bizLog_delete_img">
+            <a class="btn ui-border ui-icon-delete ui-icon-left" onclick="deleteBizLogImg()">删除图片</a>
+        </div>
+    </div>
+
+    <label  style="display: none"><input type="checkbox" id="modifyPassword" onclick="showForm(this)" for="changePassword">修改密码</label>
+
+    <div class="form ui-radius-6 ui-border" id="changePassword" style="display:none">
+        <div class="form-row">
+            <label>原始密码</label>
+            <input type="password" id="oldPass">
+        </div>
+        <div class="form-row">
+            <label>新密码</label>
+            <input type="password" id="newPass">
+        </div>
+        <div class="form-row">
+            <label>确认密码</label>
+            <input type="password" id="confirmPass">
+            <p class="error-tip" style="display:none">两次输入不一致</p>
+        </div>
+    </div>
+    <a class="btn btn-block ui-heighlight ui-radius-6" onclick="submit()" style="display: none">提 交</a>-->
+</div>
+<script>
+    function check(t){
+        var newPass=document.getElementById("newPass").value;
+        var el=t.parentNode.getElementsByTagName("p");
+        if(t.value!=newPass){
+            el[0].style.display = "block";
+            t.setAttribute("class","error")
+        }else{
+            el[0].style.display = "none";
+        }
+    }
+    var imgType;
+    function camera(type){
+        imgType=type;
+        window.jsObj.camera();
+    }
+    function choosePhoto(type){
+        imgType=type;
+        window.jsObj.choosePhoto();
+    }
+    function showForm(t) {
+        var f = t.getAttribute("for");
+        var targe = document.getElementById(f);
+        if (t.checked) {
+            targe.style.display = "block";
+        } else {
+            targe.style.display = "none";
+        }
+        document.body.scrollTop=document.body.scrollHeight;
+    }
+
+    function setImg(img) {
+        if(imgType==0){
+            updateLicenseImg(img,true);
+        }else{
+            updateBizLogImg(img,true);
+        }
+    }
+    function updateLicenseImg(license,isUploading){
+        var licenDiv=document.getElementById("license");
+        licenDiv.innerHTML="";
+        if(typeof (license)!=undefined &&license!=null &&license!=""){
+            licenDiv.className=isUploading?"pic-form uploading":"pic-form";
+
+            var img = document.createElement("img");
+            img.setAttribute("src",license);
+            img.setAttribute("value",isUploading?"":license);
+            licenDiv.appendChild(img);
+
+            document.getElementById("license_select_img").style.display = "none";
+            document.getElementById("license_delete_img").style.display = "block";
+        }else{
+            licenDiv.className="pic-form";
+            licenDiv.innerHTML="<p>上传营业执照</p>";
+            document.getElementById("license_select_img").style.display = "block";
+            document.getElementById("license_delete_img").style.display = "none";
+        }
+    }
+    function deleteLicenseImg(){
+        var licenDiv=document.getElementById("license");
+        licenDiv.innerHTML="<p>上传营业执照</p>";
+        document.getElementById("license_select_img").style.display = "block";
+        document.getElementById("license_delete_img").style.display = "none";
+    }
+    function deleteBizLogImg(){
+        var bizDiv=document.getElementById("bizLog");
+        bizDiv.innerHTML="<p>上传商家图标</p>";
+        document.getElementById("bizLog_select_img").style.display = "block";
+        document.getElementById("bizLog_delete_img").style.display = "none";
+    }
+    function updateBizLogImg(logUrl,isUploading){
+        var bizDiv=document.getElementById("bizLog");
+        bizDiv.innerHTML="";
+        if(typeof (logUrl)!=undefined &&logUrl!=null &&logUrl!=""){
+            if(isUploading)
+                bizDiv.className="pic-form uploading";
+            else
+                bizDiv.className="pic-form";
+            var img = document.createElement("img");
+            img.setAttribute("src",logUrl);
+            bizDiv.appendChild(img);
+            document.getElementById("bizLog_select_img").style.display = "none";
+            document.getElementById("bizLog_delete_img").style.display = "block";
+        }else{
+            bizDiv.className="pic-form";
+            bizDiv.innerHTML="<p>上传商家图标</p>";
+            document.getElementById("bizLog_select_img").style.display = "block";
+            document.getElementById("bizLog_delete_img").style.display = "none";
+        }
+    }
+
+    function imgUploadComplete(srcUrl,url){
+        var item= getImgDivByUrl(srcUrl);
+        item.parentNode.className="pic-form";
+        item.setAttribute("value",url);
+    }
+    function imgUploadFailure(logUrl){
+        var imgDiv=getImgDivByUrl(logUrl).parentNode;
+        imgDiv.className="pic-form";
+
+        var id=imgDiv.getAttribute("id");
+        if(id=="license"){
+            imgDiv.innerHTML="<p>上传营业执照</p>";
+            document.getElementById("license_select_img").style.display = "block";
+            document.getElementById("license_delete_img").style.display = "none";
+        }else if(id=="bizLog"){
+            imgDiv.innerHTML="<p>上传商家图标</p>";
+            document.getElementById("bizLog_select_img").style.display = "block";
+            document.getElementById("bizLog_delete_img").style.display = "none";
+        }
+    }
+
+    function getImgDivByUrl(logUrl){
+        var imgs= document.body.getElementsByTagName("img");
+        var divItem;
+        for(var i=0;i<imgs.length;i++){
+            var item=imgs[i];
+            var src=item.getAttribute("src");
+            if(src!=undefined&&src==logUrl){
+                divItem=item;
+                break;
+            }
+        }
+        return divItem;
+    }
+
+    function initBizInfo(data){
+        var biz=data;
+        var info= document.getElementById("bizInfo").getElementsByTagName("input");
+
+        for(var i=0; i< info.length;i++){
+            var item=info[i];
+            var prop=item.getAttribute("id");
+            item.value=biz[prop];
+        }
+        /*-----营业执照-----*/
+        var license=biz['licenseUrl'];
+        updateLicenseImg(license);
+
+        /*------商家logo------*/
+        var logUrl=biz['logUrl'];
+        updateBizLogImg(logUrl);
+    }
+
+    function submit(){
+        var info= document.getElementById("bizInfo").getElementsByTagName("input");
+        var busInfo={};
+        for(var i=0; i< info.length;i++){
+            var item=info[i];
+            var prop=item.getAttribute("id");
+            busInfo[prop]=item.value;
+        }
+
+ /*       var bizlog= document.getElementById("bizLog").getElementsByTagName("img");
+        if(bizlog.length>0){
+            busInfo.logUrl=bizlog[0].getAttribute("value");
+        }else{
+            busInfo.logUrl="";
+        }
+
+        var licenImg= document.getElementById("license").getElementsByTagName("img");
+        if(licenImg.length>0){
+            busInfo.licenseUrl=licenImg[0].getAttribute("value");
+        }else{
+            busInfo.licenseUrl="";
+        }*/
+
+        var passInfo={};
+      /*  var modifyPass=document.getElementById("modifyPassword");
+        if(modifyPass.checked){
+            passInfo.password=document.getElementById("oldPass").value;
+            passInfo.newPassword=document.getElementById("newPass").value;
+            var confirmPass=document.getElementById("confirmPass").value;
+
+            if(passInfo.newPassword!=confirmPass){
+                window.jsObj.showToastMsg("修改密码输入不一致");
+                return;
+            }
+        }*/
+
+        window.jsObj.submitInfo(JSON.stringify(busInfo),JSON.stringify(passInfo));
+    }
+</script>
+</body>
+</html>

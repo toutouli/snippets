@@ -26,8 +26,30 @@
 	-webkit-transform: translateY(-50%) scaleY(0.7) rotateZ(-135deg);
 	-moz-transform: translateY(-50%) scaleY(0.7) rotateZ(-135deg);
 	-ms-transform: translateY(-50%) scaleY(0.7) rotateZ(-135deg);}
+
+.btn{
+	display: inline-block;
+	line-height: 32px;
+	border-radius: 6px;
+	border: 1px solid #dcdcdc;
+	padding: 0 12px;
+}
+
+.btn:after{
+	content: "";
+	display: inline-block;
+    border-width: 4px;
+    width: 0;
+    height: 0;
+    font-size: 0;
+    border-color: #555 transparent transparent;
+    border-style: solid;
+    vertical-align: middle;
+    *border-style: solid dashed dashed;
+}
 </style>
 <body>
+	<a class="btn">更多</a>
 	<span class="arrow-down"></span>
 	<span class="arrow-right"></span>
 </body>
